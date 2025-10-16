@@ -8,9 +8,6 @@ from torch.nn.attention.flex_attention import flex_attention
 from .utils import get_freqs, nablaT_v2
 from.attention import SelfAttentionEngine
 
-# Options: "flash_attention_2", "flash_attention_3", "sdpa"
-ATTENTION_ENGINE = "auto"
-
 @torch.compile()
 @torch.autocast(device_type="cuda", dtype=torch.float32)
 def apply_scale_shift_norm(norm, x, scale, shift):
@@ -153,7 +150,7 @@ class Modulation(nn.Module):
         return self.out_layer(self.activation(x))
 
 class MultiheadSelfAttentionEnc(nn.Module):
-    def __init__(self, num_channels, head_dim):
+    def __init__(self, num_channels, head_dim, attention_engine="auto"):
         super().__init__()
         assert num_channels % head_dim == 0
         self.num_heads = num_channels // head_dim
@@ -166,7 +163,7 @@ class MultiheadSelfAttentionEnc(nn.Module):
 
         self.out_layer = nn.Linear(num_channels, num_channels, bias=True)
 
-        self.attn_engine = SelfAttentionEngine(ATTENTION_ENGINE)
+        self.attn_engine = SelfAttentionEngine(attention_engine)
 
     @torch.compile()
     def get_qkv(self, x):
@@ -211,7 +208,7 @@ class MultiheadSelfAttentionEnc(nn.Module):
         return out
 
 class MultiheadSelfAttentionDec(nn.Module):
-    def __init__(self, num_channels, head_dim):
+    def __init__(self, num_channels, head_dim, attention_engine="auto"):
         super().__init__()
         assert num_channels % head_dim == 0
         self.num_heads = num_channels // head_dim
@@ -224,7 +221,7 @@ class MultiheadSelfAttentionDec(nn.Module):
 
         self.out_layer = nn.Linear(num_channels, num_channels, bias=True)
 
-        self.attn_engine = SelfAttentionEngine(ATTENTION_ENGINE)
+        self.attn_engine = SelfAttentionEngine(attention_engine)
 
     @torch.compile()
     def get_qkv(self, x):
@@ -298,7 +295,7 @@ class MultiheadSelfAttentionDec(nn.Module):
 
 
 class MultiheadCrossAttention(nn.Module):
-    def __init__(self, num_channels, head_dim):
+    def __init__(self, num_channels, head_dim, attention_engine="auto"):
         super().__init__()
         assert num_channels % head_dim == 0
         self.num_heads = num_channels // head_dim
@@ -311,7 +308,7 @@ class MultiheadCrossAttention(nn.Module):
 
         self.out_layer = nn.Linear(num_channels, num_channels, bias=True)
 
-        self.attn_engine = SelfAttentionEngine(ATTENTION_ENGINE)
+        self.attn_engine = SelfAttentionEngine(attention_engine)
 
     @torch.compile()
     def get_qkv(self, x, cond):
