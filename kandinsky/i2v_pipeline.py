@@ -38,7 +38,7 @@ def get_first_frame_from_image(image, vae, device):
 
     with torch.no_grad():
         image = image.to(device=device, dtype=torch.float16).transpose(0, 1).unsqueeze(0)
-        lat_image = vae.encode(image, opt_tiling=False).latent_dist.sample().squeeze(0).permute(1, 2, 3, 0).cpu()
+        lat_image = vae.encode(image, opt_tiling=False).latent_dist.sample().squeeze(0).permute(1, 2, 3, 0)
         lat_image = lat_image * vae.config.scaling_factor
 
     return pil_image, lat_image, k
@@ -103,8 +103,13 @@ class Kandinsky5I2VPipeline:
         # PREPARATION
         num_frames = 1 if time_length == 0 else time_length * 24 // 4 + 1
 
-        caption = text
+        if self.offload:
+            self.vae = self.vae.to(self.device_map["vae"], non_blocking=True)
         image, image_lat, k = get_first_frame_from_image(image, self.vae, self.device_map["vae"])
+        if self.offload:
+            self.vae = self.vae.to("cpu", non_blocking=True)
+
+        caption = text
         if expand_prompts:
             transformers.set_seed(seed)
             if self.local_dit_rank == 0:
