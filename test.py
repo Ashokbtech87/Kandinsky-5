@@ -5,12 +5,15 @@ import logging
 
 import torch
 
-from kandinsky import get_T2V_pipeline, get_I2V_pipeline, get_T2I_pipeline
+from kandinsky.utils import set_hf_token
+from kandinsky import get_T2V_pipeline, get_I2V_pipeline, get_T2I_pipeline, get_I2I_pipeline
 
 
 def validate_args(args):
     size = (args.width, args.height)
-    if "t2i" in args.config:
+    if "i2i" in args.config:
+        return
+    elif "t2i" in args.config:
         supported_sizes = [(1024, 1024), (640, 1408), (1408, 640), (768, 1280), (1280, 768), (896, 1152), (1152, 896)]
     else:
         supported_sizes = [(512, 512), (512, 768), (768, 512)]
@@ -145,7 +148,17 @@ def parse_args():
         help="Name of the full attention algorithm to use for <=5 second generation",
         choices=["flash_attention_2", "flash_attention_3", "sdpa", "sage", "auto"]
     )
+    parser.add_argument(
+        "--hf_token",
+        type=str,
+        default=None,
+        help="token to download restricted models like FLUX.1-dev VAE",
+    )
     args = parser.parse_args()
+
+    if args.hf_token:
+        set_hf_token(args.hf_token)
+
     return args
 
 
@@ -160,6 +173,16 @@ if __name__ == "__main__":
     if "t2i" in args.config:
         pipe = get_T2I_pipeline(
             device_map=device_map,
+            conf_path=args.config,
+            offload=args.offload,
+            magcache=args.magcache,
+            quantized_qwen=args.qwen_quantization,
+            attention_engine=args.attention_engine,
+        )
+    elif "i2i" in args.config:
+        pipe = get_I2I_pipeline(
+            device_map=device_map,
+            resolution=1024,
             conf_path=args.config,
             offload=args.offload,
             magcache=args.magcache,
@@ -189,7 +212,7 @@ if __name__ == "__main__":
         args.output_filename = "./" + args.prompt.replace(" ", "_")
         if len(args.output_filename) > 32:
             args.output_filename = args.output_filename[:32]
-        if "t2i" in args.config:
+        if "t2i" in args.config or "i2i" in args.config:
             args.output_filename = args.output_filename + ".png"
         else:
             args.output_filename = args.output_filename + ".mp4"
@@ -199,6 +222,15 @@ if __name__ == "__main__":
         x = pipe(args.prompt,
                  width=args.width,
                  height=args.height,
+                 num_steps=args.sample_steps,
+                 guidance_weight=args.guidance_weight,
+                 scheduler_scale=args.scheduler_scale,
+                 expand_prompts=args.expand_prompt,
+                 save_path=args.output_filename,
+                 seed=args.seed)
+    elif "i2i" in args.config:
+        x = pipe(args.prompt,
+                 image=args.image,
                  num_steps=args.sample_steps,
                  guidance_weight=args.guidance_weight,
                  scheduler_scale=args.scheduler_scale,
