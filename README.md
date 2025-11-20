@@ -746,11 +746,14 @@ Parkhomenko
 # Citation
 
 ```
-@misc{kandinsky2025,
-    author = {Alexander Belykh and Alexander Varlamov and Alexey Letunovskiy and Anastasia Aliaskina and Anastasia Maltseva and Anastasiia Kargapoltseva and Andrey Shutkin and Anna Averchenkova and Anna Dmitrienko and Bulat Akhmatov and Denis Dimitrov and Denis Koposov and Denis Parkhomenko and Dmitrii and Ilya Vasiliev and Ivan Kirillov and Julia Agafonova and Kirill Chernyshev and Kormilitsyn Semen and Lev Novitskiy and Maria Kovaleva and Mikhail Mamaev and Mikhailov and Nikita Kiselev and Nikita Osterov and Nikolai Gerasimenko and Nikolai Vaulin and Olga Kim and Olga Vdovchenko and Polina Gavrilova and Polina Mikhailova and Tatiana Nikulina and Viacheslav Vasilev and Vladimir Arkhipkin and Vladimir Korviakov and Vladimir Polovnikov and Yury Kolabushin},
-    title = {Kandinsky 5.0: A family of diffusion models for Video & Image generation},
-    howpublished = {\url{https://github.com/kandinskylab/Kandinsky-5}},
-    year = 2025
+@misc{arkhipkin2025kandinsky50familyfoundation,
+      title={Kandinsky 5.0: A Family of Foundation Models for Image and Video Generation}, 
+      author={Vladimir Arkhipkin and Vladimir Korviakov and Nikolai Gerasimenko and Denis Parkhomenko and Viacheslav Vasilev and Alexey Letunovskiy and Nikolai Vaulin and Maria Kovaleva and Ivan Kirillov and Lev Novitskiy and Denis Koposov and Nikita Kiselev and Alexander Varlamov and Dmitrii Mikhailov and Vladimir Polovnikov and Andrey Shutkin and Julia Agafonova and Ilya Vasiliev and Anastasiia Kargapoltseva and Anna Dmitrienko and Anastasia Maltseva and Anna Averchenkova and Olga Kim and Tatiana Nikulina and Denis Dimitrov},
+      year={2025},
+      eprint={2511.14993},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV},
+      url={https://arxiv.org/abs/2511.14993}, 
 }
 
 @misc{mikhailov2025nablanablaneighborhoodadaptiveblocklevel,
